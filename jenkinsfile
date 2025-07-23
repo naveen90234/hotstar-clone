@@ -25,12 +25,20 @@ pipeline{
                    }
              }
         }
-        stage('Terraform plan/apply/destroy'){
-             steps{
-                 dir('EKS_TERRAFORM') {
-                      sh 'terraform ${action} --auto-approve'
-                   }
-             }
+        stage('Terraform Plan/Apply/Destroy') {
+            steps {
+                dir('EKS_TERRAFORM') {
+                    script {
+                        if (action == 'plan') {
+                            sh 'terraform plan -input=false'
+                        } else if (action == 'apply' || action == 'destroy') {
+                            sh "terraform ${action} -auto-approve -input=false"
+                        } else {
+                            error("Invalid Terraform action: ${action}")
+                        }
+                    }
+                }
+            }
         }
     }
 }
