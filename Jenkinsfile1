@@ -79,9 +79,9 @@ pipeline{
         stage("Update the Deployment Tags") {
             steps {
                 sh """
-                   cat K8S/deployment.yaml
-                   sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' K8S/deployment.yaml
-                   cat K8S/deployment.yaml
+                   cat K8S/deployment.yml
+                   sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' K8S/deployment.yml
+                   cat K8S/deployment.yml
                 """
             }
         }
@@ -91,12 +91,12 @@ pipeline{
                 GIT_USERNAME = "vinaypo"
             }
             steps {
-                withCredentials([string(credentialsId: 'github', variable: 'github')]) {
+                withCredentials([string(credentialsId: 'github-cred', variable: 'github')]) {
                 sh ''' 
 
                    git config  user.name "vinaypo"
                    git config  user.email "vapodila@gmail.com"
-                   git add K8S/deployment.yaml
+                   git add K8S/deployment.yml
                    git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}"
                    git push https://${github}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY} HEAD:main
                 '''
