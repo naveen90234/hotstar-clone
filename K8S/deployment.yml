@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: hotstar
-        image: vinay2806/hotstar:latest
+        image: vinay2806/hotstar:6
         ports:
         - containerPort: 3000  # Port your application listens on
