@@ -6,7 +6,7 @@ pipeline{
     }
     environment {
         SCANNER_HOME = tool "sonar-scanner"
-        APP_NAME= "hostar"
+        APP_NAME= "hotstar"
         DOCKER_USER = "vinay2806"
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${BUILD_NUMBER}"
@@ -76,10 +76,33 @@ pipeline{
                 sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
-        stage("deploy_docker"){
-            steps{
-                sh "docker run -d --name hotstar -p 3000:3000 ${IMAGE_NAME}:${IMAGE_TAG}"
+        stage("Update the Deployment Tags") {
+            steps {
+                sh """
+                   cat K8S/deployment.yaml
+                   sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' K8S/deployment.yaml
+                   cat K8S/deployment.yaml
+                """
             }
+        }
+        stage("Push the changes to SCM") {
+            environment {
+                GIT_REPOSITORY = "Hotstar-Clone"
+                GIT_USERNAME = "vinaypo"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'github', variable: 'github')]) {
+                sh ''' 
+
+                   git config  user.name "vinaypo"
+                   git config  user.email "vapodila@gmail.com"
+                   git add K8S/deployment.yaml
+                   git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}"
+                   git push https://${github}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY} HEAD:main
+                '''
+
+                }
+              }
         }
     }
 }
