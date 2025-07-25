@@ -80,7 +80,7 @@ pipeline{
             steps {
                 sh """
                    cat K8S/deployment.yml
-                   sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' K8S/deployment.yml
+                   sed -i 's|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' K8S/deployment.yml
                    cat K8S/deployment.yml
                 """
             }
