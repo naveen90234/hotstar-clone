@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hotstar-deployment
 spec:
-  replicas: 1  # Number of desired replicas
+  replicas: 1 # Number of desired replicas
   selector:
     matchLabels:
       app: hotstar
@@ -13,7 +13,8 @@ spec:
         app: hotstar
     spec:
       containers:
-      - name: hotstar
-        image: vinay2806/hotstar:6
-        ports:
-        - containerPort: 3000  # Port your application listens on
+        - name: hotstar
+          image: vinay2806/hotstar:6
+          imagePullPolicy: Always # Always pull the latest image
+          ports:
+            - containerPort: 3000 # Port your application listens on
