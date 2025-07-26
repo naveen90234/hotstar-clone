@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: hotstar
-          image: vinay2806/hotstar:6
+          image: vinay2806/hotstar:8
           imagePullPolicy: Always # Always pull the latest image
           ports:
             - containerPort: 3000 # Port your application listens on
