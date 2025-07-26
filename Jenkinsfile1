@@ -106,7 +106,7 @@ pipeline{
         }
         stage ("kubernetes deployment") {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: ' https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
+                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
                     sh "kubectl apply -f K8S/deployment.yml"
                     sh "kubectl apply -f K8S/service.yml"
                 }
@@ -114,7 +114,7 @@ pipeline{
         }
         stage ("kubernetes verification") {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: ' https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
+                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
                     sh "kubectl get pods -n webapps"
                     sh "kubectl get services -n webapps"
                 }
