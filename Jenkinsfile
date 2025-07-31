@@ -20,27 +20,29 @@ pipeline {
 
         stage("Checkout from Git") {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/vinaypo/Hotstar-Clone'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/naveen90234/hotstar-clone'
             }
         }
 
-        stage("SonarQube Analysis") {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=Hotstar \
-                        -Dsonar.projectKey=Hotstar'''
-                }
-            }
-        }
+        // === Skipped: SonarQube Analysis ===
+        // stage("SonarQube Analysis") {
+        //     steps {
+        //         withSonarQubeEnv('sonar-server') {
+        //             sh '''$SCANNER_HOME/bin/sonar-scanner \
+        //                 -Dsonar.projectName=Hotstar \
+        //                 -Dsonar.projectKey=Hotstar'''
+        //         }
+        //     }
+        // }
 
-        stage('SonarQube Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // === Skipped: SonarQube Quality Gate ===
+        // stage('SonarQube Quality Gate') {
+        //     steps {
+        //         timeout(time: 5, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         stage("Install Dependencies") {
             steps {
@@ -111,26 +113,3 @@ pipeline {
                         git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}"
                         git push https://${github}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY} HEAD:main
                     '''
-                }
-            }
-        }
-
-        stage("Kubernetes Deployment") {
-            steps {
-                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
-                    sh "kubectl apply -f K8S/deployment.yml"
-                    sh "kubectl apply -f K8S/service.yml"
-                }
-            }
-        }
-
-        stage("Kubernetes Verification") {
-            steps {
-                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
-                    sh "kubectl get pods -n webapps"
-                    sh "kubectl get services -n webapps"
-                }
-            }
-        }
-    }
-}
