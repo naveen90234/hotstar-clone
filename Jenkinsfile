@@ -84,14 +84,14 @@ pipeline {
                 GIT_USERNAME = "naveen90234"
             }
             steps {
-                withCredentials([string(credentialsId: 'github-cred', variable: 'github')]) {
-                    sh '''
-                        git config user.name "naveen90234"
-                        git config user.email "nc90234@gmail.com"
-                        git add K8S/deployment.yml
-                        git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}"
-                        git push https://${github}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY} HEAD:main
-                    '''
+                withCredentials([string(credentialsId: 'github-cred', variable: 'GIT_TOKEN')]) {
+            sh '''
+                git config user.name "${GIT_USERNAME}"
+                git config user.email "nc90234@gmail.com"
+                git add K8S/deployment.yml
+                git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}"
+                git push https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY}.git HEAD:main
+            '''
                 }
             }
         }
