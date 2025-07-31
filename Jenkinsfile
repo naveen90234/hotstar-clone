@@ -19,7 +19,7 @@ pipeline {
 
         stage("Checkout from Git") {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/vinaypo/Hotstar-Clone'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/naveen90234/hotstar-clone'
             }
         }
 
