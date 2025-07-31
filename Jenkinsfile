@@ -87,15 +87,15 @@ pipeline{
         }
         stage("Push the changes to SCM") {
             environment {
-                GIT_REPOSITORY = "Hotstar-Clone"
-                GIT_USERNAME = "vinaypo"
+                GIT_REPOSITORY = "hotstar-clone"
+                GIT_USERNAME = "naveen90234"
             }
             steps {
                 withCredentials([string(credentialsId: 'github-cred', variable: 'github')]) {
                 sh ''' 
 
-                   git config  user.name "vinaypo"
-                   git config  user.email "vapodila@gmail.com"
+                   git config  user.name "naveen90234"
+                   git config  user.email "nc90234@gmail.com"
                    git add K8S/deployment.yml
                    git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}"
                    git push https://${github}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY} HEAD:main
