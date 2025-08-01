@@ -113,7 +113,7 @@ pipeline {
 
         stage("Kubernetes Deployment") {
             steps {
-                withKubeConfig(credentialsId: 'k8s-creds', restrictKubeConfigAccess: true) {
+                withKubeConfig(credentialsId: 'kind-kubeconfig', restrictKubeConfigAccess: true) {
                     sh "kubectl apply -f K8S/deployment.yml"
                     sh "kubectl apply -f K8S/service.yml"
                 }
@@ -122,7 +122,7 @@ pipeline {
 
         stage("Kubernetes Verification") {
             steps {
-                withKubeConfig(credentialsId: 'k8s-creds', restrictKubeConfigAccess: true) {
+                withKubeConfig(credentialsId: 'kind-kubeconfig', restrictKubeConfigAccess: true) {
                     sh "kubectl get pods -n webapps || kubectl get pods"
                     sh "kubectl get services -n webapps || kubectl get services"
                 }
