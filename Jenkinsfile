@@ -85,8 +85,8 @@ pipeline {
                     echo "Before Update:"
                     cat K8S/deployment.yml
 
-                    sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' K8S/deployment.yml
-
+                    sed -i "s|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g" K8S/deployment.yml
+                    
                     echo "After Update:"
                     cat K8S/deployment.yml
                 '''
