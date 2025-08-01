@@ -110,6 +110,14 @@ pipeline {
                 }
             }
         }
+        stage("Debug Kubernetes Config") {
+            steps {
+                withKubeConfig(credentialsId: 'kind-kubeconfig', restrictKubeConfigAccess: true) {
+                    sh "kubectl config current-context"
+                    sh "kubectl config view"
+                }
+            }
+        }
 
         stage("Kubernetes Deployment") {
             steps {
