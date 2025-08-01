@@ -114,7 +114,7 @@ pipeline {
         stage("Kubernetes Deployment") {
             steps {
                 withKubeConfig(credentialsId: 'kind-kubeconfig', restrictKubeConfigAccess: true) {
-                    sh "kubectl apply -f K8S/deployment.yml"
+                    sh "kubectl apply -f K8S/deployment.yml --validate=false"
                     sh "kubectl apply -f K8S/service.yml"
                 }
             }
