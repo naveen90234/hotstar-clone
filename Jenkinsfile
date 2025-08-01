@@ -1,16 +1,20 @@
 pipeline {
     agent any
+
     tools {
         jdk 'jdk17'
         nodejs 'node16'
     }
+
     environment {
-        APP_NAME = "hotstar"
+        APP_NAME    = "hotstar"
         DOCKER_USER = "naveen90234"
-        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        IMAGE_NAME  = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG   = "${BUILD_NUMBER}"
     }
+
     stages {
+
         stage("Clean Workspace") {
             steps {
                 cleanWs()
@@ -46,9 +50,16 @@ pipeline {
             }
         }
 
-        stage('Trivy Image Scan') {
+        stage("Trivy Image Scan") {
             steps {
-                sh 'trivy image --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table ${IMAGE_NAME}:${IMAGE_TAG} --output trivy-image-report.html'
+                sh '''
+                    trivy image \
+                        --scanners vuln \
+                        --exit-code 0 \
+                        --severity HIGH,CRITICAL \
+                        --format table ${IMAGE_NAME}:${IMAGE_TAG} \
+                        --output trivy-image-report.html
+                '''
             }
         }
 
@@ -64,41 +75,45 @@ pipeline {
 
         stage("Clean Artifacts") {
             steps {
-                sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
             }
         }
 
         stage("Update the Deployment Tags") {
             steps {
-                sh """
+                sh '''
+                    echo "Before Update:"
                     cat K8S/deployment.yml
-                    sed -i 's|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' K8S/deployment.yml
+
+                    sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' K8S/deployment.yml
+
+                    echo "After Update:"
                     cat K8S/deployment.yml
-                """
+                '''
             }
         }
 
         stage("Push the changes to SCM") {
             environment {
                 GIT_REPOSITORY = "hotstar-clone"
-                GIT_USERNAME = "naveen90234"
+                GIT_USERNAME   = "naveen90234"
             }
             steps {
                 withCredentials([string(credentialsId: 'github-cred', variable: 'GIT_TOKEN')]) {
-            sh '''
-                git config user.name "${GIT_USERNAME}"
-                git config user.email "nc90234@gmail.com"
-                git add K8S/deployment.yml
-                git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}"
-                git push https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY}.git HEAD:main
-            '''
+                    sh '''
+                        git config user.name "${GIT_USERNAME}"
+                        git config user.email "nc90234@gmail.com"
+                        git add K8S/deployment.yml
+                        git commit -m "Update deployment manifest with image tag ${IMAGE_TAG}" || echo "No changes to commit"
+                        git push https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/${GIT_REPOSITORY}.git HEAD:main
+                    '''
                 }
             }
         }
 
         stage("Kubernetes Deployment") {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
+                withKubeConfig(credentialsId: 'k8s-creds', restrictKubeConfigAccess: true) {
                     sh "kubectl apply -f K8S/deployment.yml"
                     sh "kubectl apply -f K8S/service.yml"
                 }
@@ -107,9 +122,9 @@ pipeline {
 
         stage("Kubernetes Verification") {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'arn:aws:eks:us-east-1:741448944841:cluster/EKS_CLOUD', contextName: '', credentialsId: 'k8s-creds', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B97AACB4B28E646AEDB8C4F363D960DA.gr7.us-east-1.eks.amazonaws.com') {
-                    sh "kubectl get pods -n webapps"
-                    sh "kubectl get services -n webapps"
+                withKubeConfig(credentialsId: 'k8s-creds', restrictKubeConfigAccess: true) {
+                    sh "kubectl get pods -n webapps || kubectl get pods"
+                    sh "kubectl get services -n webapps || kubectl get services"
                 }
             }
         }
