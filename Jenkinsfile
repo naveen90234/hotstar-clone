@@ -81,21 +81,24 @@ pipeline {
 
         stage("Update the Deployment Tags") {
     steps {
-        sh """
-            echo "IMAGE_NAME: ${IMAGE_NAME}"
-            echo "IMAGE_TAG: ${IMAGE_TAG}"
+        script {
+            echo "Updating K8S deployment with image: ${IMAGE_NAME}:${IMAGE_TAG}"
 
-            echo "Before Update:"
-            cat K8S/deployment.yml
+            sh """
+                echo "Before Update:"
+                cat K8S/deployment.yml
+            """
 
-            sed -i "s|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g" K8S/deployment.yml
+            // Use Groovy interpolation to inject the values
+            sh "sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' K8S/deployment.yml"
 
-            echo "After Update:"
-            cat K8S/deployment.yml
-        """
+            sh """
+                echo "After Update:"
+                cat K8S/deployment.yml
+            """
+        }
     }
 }
-
 
 
         stage("Push the changes to SCM") {
