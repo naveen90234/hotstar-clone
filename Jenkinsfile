@@ -81,7 +81,7 @@ pipeline {
 
         stage("Update the Deployment Tags") {
             steps {
-                sh '''
+                sh """
                     echo "Before Update:"
                     cat K8S/deployment.yml
 
@@ -89,7 +89,7 @@ pipeline {
                     
                     echo "After Update:"
                     cat K8S/deployment.yml
-                '''
+                """
             }
         }
 
