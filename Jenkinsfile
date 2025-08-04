@@ -80,18 +80,23 @@ pipeline {
         }
 
         stage("Update the Deployment Tags") {
-            steps {
-                sh """
-                    echo "Before Update:"
-                    cat K8S/deployment.yml
+    environment {
+        IMAGE_NAME = "hotstar"
+        IMAGE_TAG  = "v1"
+    }
+    steps {
+        sh """
+            echo "Before Update:"
+            cat K8S/deployment.yml
 
-                    sed -i "s|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g" K8S/deployment.yml
-                    
-                    echo "After Update:"
-                    cat K8S/deployment.yml
-                """
-            }
-        }
+            sed -i "s|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g" K8S/deployment.yml
+
+            echo "After Update:"
+            cat K8S/deployment.yml
+        """
+    }
+}
+
 
         stage("Push the changes to SCM") {
             environment {
